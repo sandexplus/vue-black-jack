@@ -17,9 +17,11 @@ import { useDeck } from '@/use/deck'
 import BaseNavigation from '@/components/BaseNavigation.vue'
 import BaseGameTable from '@/components/BaseGameTable.vue'
 import { ICard } from '@/interfaces'
+import { useHint } from '@/use/hint'
 
 const store = useStore()
 const deck = useDeck()
+useHint()
 
 defineEmits([
   EmitsEnum.TOGGLE_SETTINGS,
@@ -47,9 +49,16 @@ const calculateValue = (hand: 'dealerHand' | 'playerHand') => {
     }
   }
 
-  return store.state[hand].reduce((acc: number, card: ICard, idx: number) => {
+  const points = store.state[hand].reduce((acc: number, card: ICard, idx: number) => {
     return acc + getRealValue(card.value, idx)
   }, 0)
+
+  store.commit('setScore', {
+    user: hand.replace('hand', '') + 'Scores',
+    scores: points
+  })
+
+  return points
 }
 
 const toggleSettings = () => {
@@ -68,6 +77,9 @@ const restartGame = () => {
     })
   }
   giveCards(2)
+
+  calculateValue('dealerHand')
+  calculateValue('playerHand')
 
   if (store.state.decks.length < 20) {
     deck.setDecks(store.state.deckCount)
@@ -94,6 +106,12 @@ const giveCards = (payload: {count: number, hand: 'playerHand' | 'dealerHand'}) 
     cards
   })
 
+  if (calculateValue('playerHand') === 21) {
+    store.commit('setWinner', 'player')
+    store.commit('changeGameActivity', true)
+    return
+  }
+
   if (calculateValue(payload.hand) > 21) {
     if (payload.hand === 'dealerHand') {
       store.commit('setWinner', 'player')
@@ -107,13 +125,28 @@ const giveCards = (payload: {count: number, hand: 'playerHand' | 'dealerHand'}) 
 const hold = () => {
   store.commit('changeGameActivity', true)
 
-  const dealerScore = calculateValue('dealerHand')
+  let dealerScore = calculateValue('dealerHand')
   const playerScore = calculateValue('playerHand')
 
   if (dealerScore === 21) {
     store.commit('setWinner', 'dealer')
     return
   }
+
+  while (dealerScore <= 16) {
+    store.commit('setHand', {
+      method: 'add',
+      cards: deck.giveCard(1),
+      hand: 'dealerHand'
+    })
+    dealerScore = calculateValue('dealerHand')
+  }
+
+  if (dealerScore > 21) {
+    store.commit('setWinner', 'player')
+    return
+  }
+
   if (dealerScore > playerScore) {
     store.commit('setWinner', 'dealer')
     return
@@ -122,7 +155,6 @@ const hold = () => {
 }
 
 const toggleHints = () => {
-  console.log(1)
   store.commit('setHints', !store.state.needHints)
 }
 

@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
     BaseCard: typeof import('./src/components/BaseCard.vue')['default']
     BaseGameTable: typeof import('./src/components/BaseGameTable.vue')['default']
     BaseHand: typeof import('./src/components/BaseHand.vue')['default']
+    BaseHint: typeof import('./src/components/BaseHint.vue')['default']
     BaseImg: typeof import('./src/components/BaseImg.vue')['default']
     BaseInput: typeof import('./src/components/BaseInput.vue')['default']
     BaseLayout: typeof import('./src/components/BaseLayout.vue')['default']

@@ -3,14 +3,17 @@ import { ICard } from '@/interfaces'
 
 export default createStore({
   state: {
-    deckCount: '1',
-    isSettingsOpen: false,
+    deckCount: '1' as string,
+    isSettingsOpen: false as boolean,
     decks: [] as ICard[],
     playerHand: [] as ICard[],
     dealerHand: [] as ICard[],
-    isGameFinished: false,
+    isGameFinished: false as boolean,
     winner: null as 'player' | 'dealer' | null,
-    needHints: false
+    needHints: true as boolean,
+    playerHandScores: 0 as number,
+    dealerHandScores: 0 as number,
+    hintText: 'Начните игру' as string
   },
   getters: {
   },
@@ -39,6 +42,12 @@ export default createStore({
     },
     setHints: (state, payload) => {
       state.needHints = payload
+    },
+    setHintText: (state, payload) => {
+      state.hintText = payload
+    },
+    setScore: (state, payload : {user: 'playerHandScores' | 'dealerHandScores', scores: number}) => {
+      state[payload.user] = payload.scores
     }
   },
   actions: {
