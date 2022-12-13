@@ -6,7 +6,11 @@ module.exports = defineConfig({
 module.exports = {
   configureWebpack: {
     plugins: [
-      require('unplugin-vue-components/webpack')({ /* options */ }),
-    ],
-  },
+      require('unplugin-vue-components/webpack')({ /* options */ })
+    ]
+  }
+}
+
+module.exports = {
+  publicPath: ''
 }
